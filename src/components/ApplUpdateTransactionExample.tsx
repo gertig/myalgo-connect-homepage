@@ -1,10 +1,11 @@
+import ExecutionEnvironment from '@docusaurus/ExecutionEnvironment';
 import algosdk from "algosdk";
 import React, { FormEvent, useState } from "react";
 import { Button, Col, Form, Label, Nav, NavItem, NavLink, Row, TabContent, TabPane } from "reactstrap";
+import { connection } from '../utils/connections';
 import AppIndex from "./commons/AppIndex";
 import PrismCode from './commons/Code';
 import SenderDropdown from "./commons/FromDropdown";
-import { connection } from '../utils/connections';
 import "./interactive-examples.scss";
 
 const codeV1 = `
@@ -48,7 +49,7 @@ const signedTxn = await myAlgoConnect.signTransaction(txn.toByte());
 `;
 
 export default function ApplCreateTransactionExample(): JSX.Element {
-    const accounts = window.sharedAccounts && Array.isArray(window.sharedAccounts) ? window.sharedAccounts : [];
+    const accounts = ExecutionEnvironment.canUseDOM && window.sharedAccounts && Array.isArray(window.sharedAccounts) ? window.sharedAccounts : [];
     const applProgram = "AiAEAAUEASYDB0NyZWF0b3IMTGFzdE1vZGlmaWVyBUNvdW50IjEYEkEADigxAGcpMQBnKiJnQgApMRkjEkAACjEZJBJAAA5CABgoZDEAEkEAEkIADSkxAGcqKmQlCGdCAAAlQyJDIgBD";
     const appIndex = 17155035;
     const [accountSelected, selectAccount] = useState("");
@@ -148,7 +149,7 @@ export default function ApplCreateTransactionExample(): JSX.Element {
                             </Button>
                         </Col>
                     </Row>
-                    {accounts.length === 0 && 
+                    {accounts.length === 0 &&
                         <div className="error-connect mt-3"> In order to run this example, you need to execute connect() method. </div>
                     }
                 </TabPane>

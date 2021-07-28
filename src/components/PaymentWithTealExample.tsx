@@ -1,12 +1,13 @@
+import ExecutionEnvironment from '@docusaurus/ExecutionEnvironment';
 import algosdk from "algosdk";
-import React, { FormEvent, useState } from "react";
-import { Button, Col, Form, Label, Nav, NavItem, NavLink, Row, TabContent, TabPane } from "reactstrap";
+import React, { useState } from "react";
+import { Button, Col, Label, Nav, NavItem, NavLink, Row, TabContent, TabPane } from "reactstrap";
+import { algodClient, connection } from '../utils/connections';
 import Address from "./commons/Address";
 import Amount from "./commons/Amount";
 import PrismCode from './commons/Code';
 import SenderDropdown from "./commons/FromDropdown";
 import Note from "./commons/Note";
-import { algodClient, connection } from '../utils/connections';
 import "./interactive-examples.scss";
 
 const codeV2 =
@@ -55,7 +56,7 @@ byte b32 $REPLACE_FOR_TXID
 `
 
 export default function SignTealExample(): JSX.Element {
-    const accountslist = window.sharedAccounts && Array.isArray(window.sharedAccounts) ? window.sharedAccounts : [];
+    const accountslist = ExecutionEnvironment.canUseDOM && window.sharedAccounts && Array.isArray(window.sharedAccounts) ? window.sharedAccounts : [];
     const [accounts, setAccount] = useState(accountslist);
     const [accountSelected, selectAccount] = useState("");
     const [note, setNote] = useState<Uint8Array | undefined>();

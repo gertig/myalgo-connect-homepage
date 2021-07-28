@@ -1,13 +1,14 @@
+import ExecutionEnvironment from '@docusaurus/ExecutionEnvironment';
 import algosdk from "algosdk";
 import React, { FormEvent, useState } from "react";
-import { Button, Col, Container, Form, Label, Nav, NavItem, NavLink, Row, TabContent, TabPane } from "reactstrap";
+import { Button, Col, Form, Label, Nav, NavItem, NavLink, Row, TabContent, TabPane } from "reactstrap";
+import { connection } from '../utils/connections';
 import Address from "./commons/Address";
 import Amount from "./commons/Amount";
 import AssetIndex from "./commons/AssetId";
 import PrismCode from './commons/Code';
 import SenderDropdown from "./commons/FromDropdown";
 import Note from "./commons/Note";
-import { connection } from '../utils/connections';
 import "./interactive-examples.scss";
 
 const algoSdkCode = `
@@ -54,7 +55,7 @@ const signedTxn = await myAlgoConnect.signTransaction(txn);
 `;
 
 export default function ASATransactionExample(): JSX.Element {
-    const accounts = window.sharedAccounts && Array.isArray(window.sharedAccounts) ? window.sharedAccounts : [];
+    const accounts = ExecutionEnvironment.canUseDOM && window.sharedAccounts && Array.isArray(window.sharedAccounts) ? window.sharedAccounts : [];
     const [accountSelected, selectAccount] = useState("");
     const [note, setNote] = useState<Uint8Array | undefined>();
     const [receiver, setReceiver] = useState("");

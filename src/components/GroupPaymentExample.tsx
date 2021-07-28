@@ -1,11 +1,12 @@
-import React, { useState, FormEvent } from "react";
-import { Button, Col, Container, Form, Label, Nav, NavItem, NavLink, Row, TabContent, TabPane } from "reactstrap";
+import ExecutionEnvironment from '@docusaurus/ExecutionEnvironment';
+import algosdk from "algosdk";
+import React, { FormEvent, useState } from "react";
+import { Button, Col, Form, Label, Nav, NavItem, NavLink, Row, TabContent, TabPane } from "reactstrap";
+import { connection } from '../utils/connections';
 import Address from "./commons/Address";
 import Amount from "./commons/Amount";
-import SenderDropdown from "./commons/FromDropdown";
 import PrismCode from './commons/Code';
-import algosdk from "algosdk";
-import { connection } from '../utils/connections';
+import SenderDropdown from "./commons/FromDropdown";
 import "./interactive-examples.scss";
 
 const codeV1 = `
@@ -73,7 +74,7 @@ const signedTxns = await myAlgoConnect.signTransaction(txnsArray.map(txn => txn.
 `;
 
 export default function GroupPaymentExample(): JSX.Element {
-    const accounts = window.sharedAccounts && Array.isArray(window.sharedAccounts) ? window.sharedAccounts : [];
+    const accounts = ExecutionEnvironment.canUseDOM && window.sharedAccounts && Array.isArray(window.sharedAccounts) ? window.sharedAccounts : [];
     const [accountSelected, selectAccount] = useState("");
     const [receiver1, setReceiver1] = useState("");
     const [receiver2, setReceiver2] = useState("");

@@ -1,11 +1,12 @@
+import ExecutionEnvironment from '@docusaurus/ExecutionEnvironment';
 import algosdk from "algosdk";
 import React, { useState } from "react";
 import { Button, Col, Form, Label, Nav, NavItem, NavLink, Row, TabContent, TabPane } from "reactstrap";
+import { connection } from '../utils/connections';
 import AppIndex from "./commons/AppIndex";
 import PrismCode from './commons/Code';
 import SenderDropdown from "./commons/FromDropdown";
 import Note from "./commons/Note";
-import { connection } from '../utils/connections';
 import "./interactive-examples.scss";
 
 const codeV1 = `
@@ -49,7 +50,7 @@ const signedTxn = await myAlgoConnect.signTransaction(txn.toByte());
 `;
 
 export default function AppOptInExample(): JSX.Element {
-    const accounts = window.sharedAccounts && Array.isArray(window.sharedAccounts) ? window.sharedAccounts : [];
+    const accounts = ExecutionEnvironment.canUseDOM && window.sharedAccounts && Array.isArray(window.sharedAccounts) ? window.sharedAccounts : [];
     const [accountSelected, selectAccount] = useState("");
     const [appIndex, setAppIndex] = useState("14241387");
     const [note, setNote] = useState<Uint8Array | undefined>();

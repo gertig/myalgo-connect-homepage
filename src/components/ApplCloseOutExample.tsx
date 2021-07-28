@@ -7,6 +7,7 @@ import PrismCode from './commons/Code';
 import SenderDropdown from "./commons/FromDropdown";
 import Note from "./commons/Note";
 import "./interactive-examples.scss";
+import ExecutionEnvironment from '@docusaurus/ExecutionEnvironment';
 
 const codeV1 = `
 import algosdk from "algosdk";
@@ -49,7 +50,7 @@ const signedTxn = await myAlgoConnect.signTransaction(txn.toByte());
 `;
 
 export default function AppCloseOutExample(): JSX.Element {
-    const accounts = window.sharedAccounts && Array.isArray(window.sharedAccounts) ? window.sharedAccounts : [];
+    const accounts = ExecutionEnvironment.canUseDOM && window.sharedAccounts && Array.isArray(window.sharedAccounts) ? window.sharedAccounts : [];
     const [accountSelected, selectAccount] = useState("");
     const [appIndex, setAppIndex] = useState("14241387");
     const [note, setNote] = useState<Uint8Array | undefined>();
