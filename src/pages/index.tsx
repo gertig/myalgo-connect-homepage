@@ -3,24 +3,22 @@ import Layout from '@theme/Layout';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import clsx from 'clsx';
 import 'prismjs/themes/prism.css';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
+import { useInView } from 'react-intersection-observer';
+import FooterSection from '../components/commons/footer/footer';
+import "../components/commons/footer/footer.scss";
 import Connect from '../components/homepage/Connect';
 import SendTransaction from '../components/homepage/SendTransaction';
 import SignTransaction from '../components/homepage/SignTransaction';
 import AccountsProvider from "../context/accountsContext";
-import ParamsProvider from "../context/paramsContext";
-import { algodClient, connection } from '../utils/connections';
-import './index.scss';
-import { useInView } from 'react-intersection-observer';
+import PreLoadDataContextComponent, { PreLoadDataContext } from '../context/preLoadedData';
 import { sleep } from '../utils/algorand';
-import FooterSection from '../components/commons/footer/footer';
-import "../components/commons/footer/footer.scss";
+import './index.scss';
 
-let timeoutResolution = null;
 
 export default function Home() {
+  const preLoadedData = useContext(PreLoadDataContext);
   const { siteConfig } = useDocusaurusContext();
-  const [params, setParams] = useState({});
   const [accounts, setAccounts] = useState([]);
   const [txToSend, setTxToSend] = useState();
   const [selectIcon, setSelectedIcon] = useState(0);
@@ -38,22 +36,6 @@ export default function Home() {
   const callbackSignedTxn = (txToSendParm) => {
     setTxToSend(txToSendParm);
   }
-
-  const getTransactionParams = async () => {
-    try {
-      const params = await algodClient.getTransactionParams().do();
-      setParams(params);
-    }
-    catch (err) {
-      console.error(err);
-    }
-    timeoutResolution = setTimeout(getTransactionParams, 100000);
-  }
-
-  useEffect(() => {
-    if (timeoutResolution) clearTimeout(timeoutResolution);
-    getTransactionParams();
-  }, [])
 
   const applyEffect = async (toDisplay: number) => {
     if (toDisplay === selectIcon) return;
@@ -215,16 +197,13 @@ export default function Home() {
             </h2>
             </div>
             <div className="code-section">
-              <Connect
-                connection={connection}
-                onComplete={onCompleteConnect}
-              />
-              <ParamsProvider params={params}>
+              <PreLoadDataContextComponent>
+                <Connect onComplete={onCompleteConnect} />
                 <AccountsProvider accounts={accounts}>
                   <SignTransaction callbackSignedTxn={callbackSignedTxn} />
                 </AccountsProvider>
-              </ParamsProvider>
-              <SendTransaction txToSend={txToSend} />
+                <SendTransaction txToSend={txToSend} />
+              </PreLoadDataContextComponent>
             </div>
           </div>
         </section>

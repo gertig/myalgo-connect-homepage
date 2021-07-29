@@ -1,8 +1,8 @@
 import ExecutionEnvironment from '@docusaurus/ExecutionEnvironment';
-import algosdk from "algosdk";
-import React, { FormEvent, useState } from "react";
+
+import React, { FormEvent, useContext, useState } from "react";
 import { Button, Col, Form, Label, Nav, NavItem, NavLink, Row, TabContent, TabPane } from "reactstrap";
-import { connection } from '../utils/connections';
+import PreLoadDataContextComponent, { PreLoadDataContext } from '../context/preLoadedData';
 import PrismCode from './commons/Code';
 import SenderDropdown from "./commons/FromDropdown";
 import Integer from "./commons/Integer";
@@ -57,7 +57,8 @@ const myAlgoConnect = new MyAlgoConnect();
 const signedTxn = await myAlgoConnect.signTransaction(txn.toByte());
 `;
 
-export default function ApplCreateTransactionExample(): JSX.Element {
+function ApplCreateTransactionExample(): JSX.Element {
+    const preLoadedData = useContext(PreLoadDataContext);
     const accounts = ExecutionEnvironment.canUseDOM && window.sharedAccounts && Array.isArray(window.sharedAccounts) ? window.sharedAccounts : [];
     const [localInt, setLocalInt] = useState(0);
     const [globalInt, setGlobalInt] = useState(0);
@@ -86,7 +87,7 @@ export default function ApplCreateTransactionExample(): JSX.Element {
                 lastRound: 15250878,
             }
 
-            const txn = algosdk.makeApplicationCreateTxnFromObject({
+            const txn = preLoadedData.algosdk.makeApplicationCreateTxnFromObject({
                 suggestedParams: {
                     ...params,
                     fee: 1000,
@@ -102,8 +103,7 @@ export default function ApplCreateTransactionExample(): JSX.Element {
                 onComplete: 0,
             });
 
-            const signedTxn = await connection.signTransaction(txn.toByte());
-            // const response = await algodClient.sendRawTransaction(signedTxn.blob).do();
+            const signedTxn = await preLoadedData.myAlgoWallet.signTransaction(txn.toByte());
 
             setResponse(signedTxn);
         }
@@ -167,7 +167,7 @@ export default function ApplCreateTransactionExample(): JSX.Element {
                             </Button>
                         </Col>
                     </Row>
-                    {accounts.length === 0 && 
+                    {accounts.length === 0 &&
                         <div className="error-connect mt-3"> In order to run this example, you need to execute connect() method. </div>
                     }
                 </TabPane>
@@ -198,3 +198,5 @@ export default function ApplCreateTransactionExample(): JSX.Element {
         </div>
     )
 }
+
+export default () => <PreLoadDataContextComponent><ApplCreateTransactionExample /></PreLoadDataContextComponent>;

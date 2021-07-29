@@ -1,8 +1,8 @@
 import ExecutionEnvironment from '@docusaurus/ExecutionEnvironment';
-import algosdk from "algosdk";
-import React, { FormEvent, useState } from "react";
+
+import React, { FormEvent, useContext, useState } from "react";
 import { Button, Col, Form, Label, Nav, NavItem, NavLink, Row, TabContent, TabPane } from "reactstrap";
-import { connection } from '../utils/connections';
+import PreLoadDataContextComponent, { PreLoadDataContext } from '../context/preLoadedData';
 import Address from "./commons/Address";
 import Amount from "./commons/Amount";
 import AssetIndex from "./commons/AssetId";
@@ -54,7 +54,8 @@ const myAlgoConnect = new MyAlgoConnect();
 const signedTxn = await myAlgoConnect.signTransaction(txn);
 `;
 
-export default function ASATransactionExample(): JSX.Element {
+function ASATransactionExample(): JSX.Element {
+    const preLoadedData = useContext(PreLoadDataContext);
     const accounts = ExecutionEnvironment.canUseDOM && window.sharedAccounts && Array.isArray(window.sharedAccounts) ? window.sharedAccounts : [];
     const [accountSelected, selectAccount] = useState("");
     const [note, setNote] = useState<Uint8Array | undefined>();
@@ -83,7 +84,7 @@ export default function ASATransactionExample(): JSX.Element {
                 lastRound: 15250878,
             }
 
-            const txn = algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
+            const txn = preLoadedData.algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
                 suggestedParams: {
                     ...params,
                     fee: 1000,
@@ -91,12 +92,11 @@ export default function ASATransactionExample(): JSX.Element {
                 },
                 from: accountSelected,
                 to: receiver, note,
-                amount: algosdk.algosToMicroalgos(amount) * 100,
+                amount: preLoadedData.algosdk.algosToMicroalgos(amount) * 100,
                 assetIndex: assetIndex
             });
 
-            const signedTxn = await connection.signTransaction(txn.toByte());
-            // const response = await algodClient.sendRawTransaction(signedTxn.blob).do();
+            const signedTxn = await preLoadedData.myAlgoWallet.signTransaction(txn.toByte());
 
             setResponse(signedTxn);
         }
@@ -191,3 +191,5 @@ export default function ASATransactionExample(): JSX.Element {
         </div>
     )
 }
+
+export default () => <PreLoadDataContextComponent><ASATransactionExample /></PreLoadDataContextComponent>;

@@ -1,6 +1,7 @@
 import ExecutionEnvironment from "@docusaurus/ExecutionEnvironment";
-import React, { MouseEvent, useEffect, useState } from "react";
+import React, { MouseEvent, useContext, useState } from "react";
 import { Button, Col, Label, Row } from "reactstrap";
+import PreLoadDataContextComponent, { PreLoadDataContext } from "../context/preLoadedData";
 import PrismCode from './commons/Code';
 
 const code = `
@@ -11,16 +12,15 @@ const myAlgoConnect = new MyAlgoConnect();
 const accounts = await myAlgoConnect.connect({ shouldSelectOneAccount: true });
 `;
 
-export default function ConnectExample(): JSX.Element {
+function ConnectExample(): JSX.Element {
+    const preLoadedData = useContext(PreLoadDataContext);
     const [accounts, setAccounts] = useState<[]>([]);
-    const [myAlgoWallet, setMyAlgoWallet] = useState();
 
     const onClick = async (e: MouseEvent): Promise<void> => {
         e.preventDefault();
         try {
             if (ExecutionEnvironment.canUseDOM) {
-                //@ts-ignore
-                const sharedAccounts = await myAlgoWallet.connect();
+                const sharedAccounts = await preLoadedData.myAlgoWallet.connect();
                 setAccounts(sharedAccounts);
                 window.sharedAccounts = sharedAccounts;
             }
@@ -33,14 +33,6 @@ export default function ConnectExample(): JSX.Element {
     const onClearResponse = (): void => {
         setAccounts([]);
     }
-
-    useEffect(() => {
-        import("@randlabs/myalgo-connect").then(x => {
-            //@ts-ignore
-            setMyAlgoWallet(new x.default({ bridgeUrl: "https://dev.myalgo.com/bridge" }));
-
-        });
-    }, [])
 
     return (
         <Row className="connect-example-content interactive-example">
@@ -82,3 +74,5 @@ export default function ConnectExample(): JSX.Element {
         </Row>
     )
 }
+
+export default () => <PreLoadDataContextComponent><ConnectExample /></PreLoadDataContextComponent>;

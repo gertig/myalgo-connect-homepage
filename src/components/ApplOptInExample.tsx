@@ -1,8 +1,8 @@
 import ExecutionEnvironment from '@docusaurus/ExecutionEnvironment';
-import algosdk from "algosdk";
-import React, { useState } from "react";
+
+import React, { useContext, useEffect, useState } from "react";
 import { Button, Col, Form, Label, Nav, NavItem, NavLink, Row, TabContent, TabPane } from "reactstrap";
-import { connection } from '../utils/connections';
+import PreLoadDataContextComponent, { PreLoadDataContext } from '../context/preLoadedData';
 import AppIndex from "./commons/AppIndex";
 import PrismCode from './commons/Code';
 import SenderDropdown from "./commons/FromDropdown";
@@ -49,7 +49,8 @@ const myAlgoConnect = new MyAlgoConnect();
 const signedTxn = await myAlgoConnect.signTransaction(txn.toByte());
 `;
 
-export default function AppOptInExample(): JSX.Element {
+function ApplOptInExample(): JSX.Element {
+    const preLoadedData = useContext(PreLoadDataContext);
     const accounts = ExecutionEnvironment.canUseDOM && window.sharedAccounts && Array.isArray(window.sharedAccounts) ? window.sharedAccounts : [];
     const [accountSelected, selectAccount] = useState("");
     const [appIndex, setAppIndex] = useState("14241387");
@@ -76,7 +77,7 @@ export default function AppOptInExample(): JSX.Element {
                 lastRound: 15250878,
             }
 
-            const txn = algosdk.makeApplicationOptInTxnFromObject({
+            const txn = preLoadedData.algosdk.makeApplicationOptInTxnFromObject({
                 suggestedParams: {
                     ...params,
                     fee: 1000,
@@ -87,9 +88,7 @@ export default function AppOptInExample(): JSX.Element {
                 note: note
             });
 
-            const signedTxn = await connection.signTransaction(txn.toByte());
-            // const response = await algodClient.sendRawTransaction(signedTxn.blob).do();
-
+            const signedTxn = await preLoadedData.myAlgoWallet.signTransaction(txn.toByte());
             setResponse(signedTxn);
         }
         catch (err) {
@@ -181,3 +180,5 @@ export default function AppOptInExample(): JSX.Element {
         </div>
     )
 }
+
+export default () => <PreLoadDataContextComponent><ApplOptInExample /></PreLoadDataContextComponent>;
